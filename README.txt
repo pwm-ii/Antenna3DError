@@ -10,7 +10,8 @@ radiation patterns. It is designed to evaluate the accuracy of interpolation alg
 2.) INPUT REQUIREMENTS
 ---------------------------------------------------------------------------
 The script performs an automated join based on angular coordinates. To ensure 
-successful alignment, both files should use the same grid resolution.
+successful alignment, both files should use the same grid resolution. Script 
+normalizes gain to max value for both files. 
 
 Define CSV Headers:
    e.g. Original Truth File:
