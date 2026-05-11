@@ -67,19 +67,18 @@ class AntennaComparisonViewer:
         self.root.rowconfigure(0, weight=1)
 
         # Plot 1: Interpolated
-        self.p1 = PlotPanel(self.root, "Reconstructed Pattern (Interpolated)", projection='polar')
+        self.p1 = PlotPanel(self.root, "Reconstructed Pattern (Normalized)", projection='polar')
         self.p1.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
         self._draw_polar_heatmap(self.p1, self.grid_interp.values, cm.nipy_spectral, "Gain [dB]", self.vmin, self.vmax)
 
         # Plot 2: Original
-        self.p2 = PlotPanel(self.root, "Actual Pattern (Original)", projection='polar')
+        self.p2 = PlotPanel(self.root, "Actual Pattern (Normalized)", projection='polar')
         self.p2.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
         self._draw_polar_heatmap(self.p2, self.grid_orig.values, cm.nipy_spectral, "Gain [dB]", self.vmin, self.vmax)
 
         # Plot 3: Error Heatmap (Legend Inverted)
         self.p3 = PlotPanel(self.root, "Absolute Error Heatmap", projection='polar')
         self.p3.grid(row=0, column=2, sticky="nsew", padx=5, pady=5)
-        # Using YlOrRd_r so 0 dB is white/yellow and 15 dB is dark red
         self._draw_polar_heatmap(self.p3, self.grid_error.values, cm.viridis_r, "Abs Error [dB]", invert_cbar=True)
 
         # Stats Bar
@@ -121,6 +120,12 @@ def calculate_antenna_mse(file_interp, file_orig):
     
         df_interp.columns = [c.strip() for c in df_interp.columns]
         df_orig.columns = [c.strip() for c in df_orig.columns]
+
+        # --- NORMALIZATION STEP ---
+        # Shift both patterns so the peak gain is 0 dB
+        df_interp[INTERP_TARGET] = df_interp[INTERP_TARGET] - df_interp[INTERP_TARGET].max()
+        df_orig[ORIG_TARGET] = df_orig[ORIG_TARGET] - df_orig[ORIG_TARGET].max()
+        # --------------------------
         
         df_orig[ORIG_PHI] = df_orig[ORIG_PHI].round(COORD_ROUNDING)
         df_orig[ORIG_THETA] = df_orig[ORIG_THETA].round(COORD_ROUNDING)
@@ -150,6 +155,6 @@ def calculate_antenna_mse(file_interp, file_orig):
         print(f"Error: {e}")
 
 if __name__ == "__main__":
-    path_interp = r"C:\User\Downloads\ApproximationFile.csv"
+    path_interp = r"C:\User\Downloads\InterpolatedFile.csv"
     path_orig   = r"C:\User\Downloads\OriginalFile.csv"
     calculate_antenna_mse(path_interp, path_orig)
