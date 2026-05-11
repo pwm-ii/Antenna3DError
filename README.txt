@@ -1,36 +1,48 @@
-
-                        ERROR ANALYSIS TOOL README
+ANTENNA PATTERN ERROR ANALYSIS TOOL
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 1.) PURPOSE
 ---------------------------------------------------------------------------
-Verifies the accuracy of 3D antenna pattern interpolation by comparing a 
-Predicted CSV against a Ground Truth CSV.
+This tool provides a visual and statistical comparison between two 3D antenna 
+radiation patterns. It is designed to evaluate the accuracy of interpolation algorithms.
 
 
-2.) INPUT
+2.) INPUT REQUIREMENTS
 ---------------------------------------------------------------------------
-Both CSV files must share the same angular grid (step size) and contain 
-these exact headers:
+The script performs an automated join based on angular coordinates. To ensure 
+successful alignment, both files should use the same grid resolution.
 
-  1. Phi[deg]
-  2. Theta[deg]
-  3. dB10normalize(GainTotal) 
-     (Rename your gain column to this if necessary)
+Define CSV Headers:
+   e.g. Original Truth File:
+   - Phi[deg]
+   - Theta[deg]
+   - dB(GainTotal)
+
+   e.g. Interpolated File:
+   - Phi[deg]
+   - Theta[deg]
+   - Gain[dB]
+
+Data Formatting Notes:
+   - Theta (Elevation): Expected range [0, 180].
+   - Phi (Azimuth): Expected range [0, 360] or [-180, 180].
+   - The tool automatically rounds coordinates to 3 decimal places to 
+     mitigate floating-point mismatches during the merge process.
 
 
-3.) RESULTS
+3.) METRICS & RESULTS
 ---------------------------------------------------------------------------
-RMSE (Root Mean Sq Error):
-   - The primary accuracy metric.
+The tool calculates three primary statistical indicators:
+
+MSE (Mean Squared Error):
+   - Measures the average squared difference between predicted and actual gain.
+   - Useful for penalizing large individual outliers.
+
+RMSE (Root Mean Square Error):
+   - The primary accuracy metric, expressed in the same units as the input (dB).
+   - Represents the standard deviation of the prediction errors.
 
 Mean Bias:
-   - The average tendency of the prediction.
-   - Positive (+): Optimistic (Predicting higher signal than reality).
-   - Negative (-): Conservative (Predicting lower signal than reality).
-
-Error Heatmaps:
-   - Left/Center: Visual comparison of patterns.
-   - Right (Error): 
-       - Blue/Black: Minimal error.
-       - Red/Yellow: Indicates a mismatch.
+   - Indicates if the model has a systematic tendency to over or under-predict.
+   - Positive (+): "Optimistic" (Predicting higher gain than reality).
+   - Negative (-): "Conservative" (Predicting lower gain than reality).
